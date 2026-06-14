@@ -3,7 +3,6 @@ from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
-# Красивая HTML + CSS + JS разметка сайта прямо внутри Python-файла
 HTML_CODE = """
 <!DOCTYPE html>
 <html lang="ru">
@@ -31,7 +30,7 @@ HTML_CODE = """
             background: #110022;
         }
 
-        /* 2. ЗАДНИЙ ФОН: Фиолетовый и жёлтый смешиваются и двигаются сверху вниз */
+        /* ЗАДНИЙ ФОН: Фиолетовый и жёлтый смешиваются и двигаются */
         .animated-bg {
             position: fixed;
             top: 0;
@@ -39,10 +38,8 @@ HTML_CODE = """
             width: 100vw;
             height: 100vh;
             z-index: -1;
-            /* Смешивание со сторон фиолетового и тёмно-жёлтого */
             background: linear-gradient(135deg, #2b004f 20%, #cca000 50%, #4a0082 80%);
             background-size: 200% 400%;
-            /* Бесконечная плавная анимация движения сверху вниз */
             animation: moveBackground 12s ease-in-out infinite;
         }
 
@@ -52,7 +49,7 @@ HTML_CODE = """
             100% { background-position: 50% 0%; }
         }
 
-        /* Контейнер сайта, не касающийся краев и заднего фона напрямую */
+        /* Контейнер сайта */
         .wrapper {
             width: 100%;
             max-width: 600px;
@@ -72,7 +69,6 @@ HTML_CODE = """
             letter-spacing: 2px;
             text-align: center;
             margin-bottom: 30px;
-            /* Эффект глянца и неонового свечения */
             text-shadow: 
                 0 0 10px rgba(255, 215, 0, 0.6),
                 0 0 20px rgba(255, 215, 0, 0.4),
@@ -83,17 +79,19 @@ HTML_CODE = """
             filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5));
         }
 
-        /* Навигация с кнопками */
+        /* Навигация с кнопками (добавлен wrap, чтобы кнопки не сжимались на смартфонах) */
         .nav-menu {
             display: flex;
             width: 100%;
             gap: 10px;
             margin-bottom: 25px;
+            flex-wrap: wrap;
         }
 
-        /* КНОПКИ С АНИМАЦИЕЙ НАЖАТИЯ (Не касаются фона благодаря тени и отступам) */
-        .nav-btn {
+        /* КНОПКИ С АНИМАЦИЕЙ НАЖАТИЯ */
+        .nav-btn, .forum-link {
             flex: 1;
+            min-width: 100px;
             padding: 12px 5px;
             font-size: 0.95rem;
             font-weight: bold;
@@ -105,13 +103,25 @@ HTML_CODE = """
             box-shadow: 0 5px 0 #B8860B, 0 8px 15px rgba(0, 0, 0, 0.4);
             transition: all 0.1s ease;
             text-align: center;
+            text-decoration: none; /* Чтобы у ссылки форума не было подчеркивания */
+        }
+
+        /* Эффект для кнопки Форума, чтобы она выделялась красивым бирюзовым цветом */
+        .forum-link {
+            background: #00FFCC;
+            box-shadow: 0 5px 0 #00A383, 0 8px 15px rgba(0, 0, 0, 0.4);
         }
 
         /* Эффект нажатия кнопок */
-        .nav-btn:active {
+        .nav-btn:active, .forum-link:active {
             transform: translateY(4px);
             box-shadow: 0 1px 0 #B8860B, 0 4px 6px rgba(0, 0, 0, 0.4);
             background: #FFC72C;
+        }
+        
+        .forum-link:active {
+            background: #00E6B8;
+            box-shadow: 0 1px 0 #00A383;
         }
 
         .nav-btn.active {
@@ -123,7 +133,7 @@ HTML_CODE = """
             box-shadow: 0 1px 0 #CD5C5C;
         }
 
-        /* Контентная зона подложки (отделена от фона) */
+        /* Контентная зона подложки */
         .content-box {
             background: rgba(20, 0, 40, 0.75);
             backdrop-filter: blur(10px);
@@ -217,6 +227,7 @@ HTML_CODE = """
             <button class="nav-btn active" onclick="openTab('main', this)">Главная</button>
             <button class="nav-btn" onclick="openTab('how-to', this)">Как играть?</button>
             <button class="nav-btn" onclick="openTab('donate', this)">Донат</button>
+            <a href="https://bishkek-roleplay.sampproject.ru/index.php?whats-new/" target="_blank" class="forum-link">Форум</a>
         </div>
 
         <div class="content-box">
@@ -224,7 +235,7 @@ HTML_CODE = """
             <div id="main" class="tab-content active">
                 <h2>Добро пожаловать, Игрок!</h2>
                 <p>Мы искренне рады приветствовать тебя в мире <strong>Bishkek RP</strong>! Это место, где твои самые смелые игровые амбиции становятся реальностью.</p>
-                <p>Bishkek RP — это продвинутый симулятор реальной жизни на твоем мобильном устройстве. Окунись в потрясающую атмосферу нашего города, общайся с тысячами игроков, создавай уникальные истории и весело проводи время в дружной компании!</p>
+                <p>Bishkek RP — это продвинутый симулятор реальной жизни на твоем мобильном устройстве. Окунись в потрясающую атмосферу нашего города, общайся с тысячими игроков, создавай уникальные истории и весело проводи время в дружной компании!</p>
             </div>
 
             <div id="how-to" class="tab-content">
@@ -288,15 +299,12 @@ HTML_CODE = """
 
     <script>
         function openTab(tabId, buttonElement) {
-            // Скрываем весь контент
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
             
-            // Снимаем выделение со всех кнопок
             const buttons = document.querySelectorAll('.nav-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             
-            // Показываем нужный контент и активируем кнопку
             document.getElementById(tabId).classList.add('active');
             buttonElement.classList.add('active');
         }
@@ -310,5 +318,6 @@ def home():
     return render_template_string(HTML_CODE)
 
 if __name__ == '__main__':
-    # Запуск сервера на порту 5000
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Автоматический подбор порта под хостинг Render
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
