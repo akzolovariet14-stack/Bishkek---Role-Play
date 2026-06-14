@@ -3,6 +3,7 @@ from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
+# Полный оригинальный код с рабочими кнопками Форума и Скачивания APK!
 HTML_CODE = """
 <!DOCTYPE html>
 <html lang="ru">
@@ -30,7 +31,7 @@ HTML_CODE = """
             background: #110022;
         }
 
-        /* ЗАДНИЙ ФОН: Фиолетовый и жёлтый смешиваются и двигаются */
+        /* ЗАДНИЙ ФОН: Фиолетовый и жёлтый смешиваются и двигаются сверху вниз */
         .animated-bg {
             position: fixed;
             top: 0;
@@ -79,21 +80,21 @@ HTML_CODE = """
             filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5));
         }
 
-        /* Навигация с кнопками (добавлен wrap, чтобы кнопки не сжимались на смартфонах) */
+        /* Навигация с кнопками (адаптивная сетка под 4 кнопки) */
         .nav-menu {
             display: flex;
             width: 100%;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 25px;
             flex-wrap: wrap;
         }
 
         /* КНОПКИ С АНИМАЦИЕЙ НАЖАТИЯ */
-        .nav-btn, .forum-link {
+        .nav-btn, .forum-link, .apk-btn {
             flex: 1;
-            min-width: 100px;
+            min-width: 120px;
             padding: 12px 5px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: bold;
             border: none;
             border-radius: 12px;
@@ -103,25 +104,37 @@ HTML_CODE = """
             box-shadow: 0 5px 0 #B8860B, 0 8px 15px rgba(0, 0, 0, 0.4);
             transition: all 0.1s ease;
             text-align: center;
-            text-decoration: none; /* Чтобы у ссылки форума не было подчеркивания */
+            text-decoration: none;
         }
 
-        /* Эффект для кнопки Форума, чтобы она выделялась красивым бирюзовым цветом */
+        /* Кнопка Форума (Бирюзовая) */
         .forum-link {
             background: #00FFCC;
             box-shadow: 0 5px 0 #00A383, 0 8px 15px rgba(0, 0, 0, 0.4);
         }
 
+        /* Кнопка Скачать игру (Ярко-зелёная) */
+        .apk-btn {
+            background: #2ecc71;
+            box-shadow: 0 5px 0 #27ae60, 0 8px 15px rgba(0, 0, 0, 0.4);
+            color: #fff;
+        }
+
         /* Эффект нажатия кнопок */
-        .nav-btn:active, .forum-link:active {
+        .nav-btn:active, .forum-link:active, .apk-btn:active {
             transform: translateY(4px);
             box-shadow: 0 1px 0 #B8860B, 0 4px 6px rgba(0, 0, 0, 0.4);
             background: #FFC72C;
         }
-        
+
         .forum-link:active {
             background: #00E6B8;
             box-shadow: 0 1px 0 #00A383;
+        }
+
+        .apk-btn:active {
+            background: #27ae60;
+            box-shadow: 0 1px 0 #1e7e34;
         }
 
         .nav-btn.active {
@@ -228,6 +241,7 @@ HTML_CODE = """
             <button class="nav-btn" onclick="openTab('how-to', this)">Как играть?</button>
             <button class="nav-btn" onclick="openTab('donate', this)">Донат</button>
             <a href="https://bishkek-roleplay.sampproject.ru/index.php?whats-new/" target="_blank" class="forum-link">Форум</a>
+            <button id="download-btn" class="apk-btn">Скачать игру</button>
         </div>
 
         <div class="content-box">
@@ -235,7 +249,7 @@ HTML_CODE = """
             <div id="main" class="tab-content active">
                 <h2>Добро пожаловать, Игрок!</h2>
                 <p>Мы искренне рады приветствовать тебя в мире <strong>Bishkek RP</strong>! Это место, где твои самые смелые игровые амбиции становятся реальностью.</p>
-                <p>Bishkek RP — это продвинутый симулятор реальной жизни на твоем мобильном устройстве. Окунись в потрясающую атмосферу нашего города, общайся с тысячими игроков, создавай уникальные истории и весело проводи время в дружной компании!</p>
+                <p>Bishkek RP — это продвинутый симулятор реальной жизни на твоем мобильном устройстве. Окунись в потрясающую атмосферу нашего города, общайся с тысячами игроков, создавай уникальные истории и весело проводи время в дружной компании!</p>
             </div>
 
             <div id="how-to" class="tab-content">
@@ -251,46 +265,16 @@ HTML_CODE = """
                 <p>Здесь ты можешь приобрести внутреннюю валюту <strong>Bish Coins (BC)</strong> за реальные Сомы для быстрого старта.</p>
                 
                 <div class="donate-grid">
-                    <div class="donate-item">
-                        <span class="som-text">100 сом</span>
-                        <span class="bc-text">190 BC</span>
-                    </div>
-                    <div class="donate-item">
-                        <span class="som-text">250 сом</span>
-                        <span class="bc-text">350 BC</span>
-                    </div>
-                    <div class="donate-item">
-                        <span class="som-text">340 сом</span>
-                        <span class="bc-text">420 BC</span>
-                    </div>
-                    <div class="donate-item">
-                        <span class="som-text">450 сом</span>
-                        <span class="bc-text">580 BC</span>
-                    </div>
-                    <div class="donate-item">
-                        <span class="som-text">620 сом</span>
-                        <span class="bc-text">770 BC</span>
-                    </div>
-                    <div class="donate-item">
-                        <span class="som-text">750 сом</span>
-                        <span class="bc-text">990 BC</span>
-                    </div>
-                    <div class="donate-item">
-                        <span class="som-text">1290 сом</span>
-                        <span class="bc-text">1890 BC</span>
-                    </div>
-                    <div class="donate-item">
-                        <span class="som-text">1570 сом</span>
-                        <span class="bc-text">2190 BC</span>
-                    </div>
-                    <div class="donate-item">
-                        <span class="som-text">1990 сом</span>
-                        <span class="bc-text">2790 BC</span>
-                    </div>
-                    <div class="donate-item">
-                        <span class="som-text">2390 сом</span>
-                        <span class="bc-text">3290 BC</span>
-                    </div>
+                    <div class="donate-item"><span class="som-text">100 сом</span><span class="bc-text">190 BC</span></div>
+                    <div class="donate-item"><span class="som-text">250 сом</span><span class="bc-text">350 BC</span></div>
+                    <div class="donate-item"><span class="som-text">340 сом</span><span class="bc-text">420 BC</span></div>
+                    <div class="donate-item"><span class="som-text">450 сом</span><span class="bc-text">580 BC</span></div>
+                    <div class="donate-item"><span class="som-text">620 сом</span><span class="bc-text">770 BC</span></div>
+                    <div class="donate-item"><span class="som-text">750 сом</span><span class="bc-text">990 BC</span></div>
+                    <div class="donate-item"><span class="som-text">1290 сом</span><span class="bc-text">1890 BC</span></div>
+                    <div class="donate-item"><span class="som-text">1570 сом</span><span class="bc-text">2190 BC</span></div>
+                    <div class="donate-item"><span class="som-text">1990 сом</span><span class="bc-text">2790 BC</span></div>
+                    <div class="donate-item"><span class="som-text">2390 сом</span><span class="bc-text">3290 BC</span></div>
                 </div>
             </div>
 
@@ -298,6 +282,7 @@ HTML_CODE = """
     </div>
 
     <script>
+        // Функция переключения вкладок
         function openTab(tabId, buttonElement) {
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
@@ -308,6 +293,32 @@ HTML_CODE = """
             document.getElementById(tabId).classList.add('active');
             buttonElement.classList.add('active');
         }
+
+        // Логика интерактивного скачивания APK
+        document.getElementById('download-btn').addEventListener('click', function() {
+            const btn = this;
+            
+            // 1. Меняем текст на "Загрузка..."
+            btn.textContent = 'Загрузка...';
+            btn.style.pointerEvents = 'none'; // Отключаем клики во время старта
+            
+            // Твоя проверенная ссылка на Google Диск
+            const directLink = 'https://drive.google.com/file/d/1wEjTeMJg-49poG-sTZMyHNroF_YPy1AQ/view?usp=drivesdk';
+            
+            // 2. Инициируем переход
+            const tempLink = document.createElement('a');
+            tempLink.href = directLink;
+            tempLink.target = '_blank';
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+            
+            // 3. Через 4 секунды возвращаем прежний текст кнопки
+            setTimeout(() => {
+                btn.textContent = 'Скачать игру';
+                btn.style.pointerEvents = 'auto';
+            }, 4000);
+        });
     </script>
 </body>
 </html>
@@ -318,6 +329,5 @@ def home():
     return render_template_string(HTML_CODE)
 
 if __name__ == '__main__':
-    # Автоматический подбор порта под хостинг Render
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
